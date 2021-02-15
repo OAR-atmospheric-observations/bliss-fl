@@ -4,7 +4,7 @@ Multi-instrument fuzzy logic PBL height detection algorithm using CLAMPS Doppler
 ## Authors
 Dr. Elizabeth Smith, NOAA NSSL (elizabeth.smith@noaa.gov)
 
-Dr. Jacob Carlin, OU CIMMS / NSSL (jacob.carlin@noaa.gov)
+Dr. Jacob Carlin, OU CIMMS / NSSL (jacob.carlin@noaa.gov; @jtcarlin)
 
 ## Background
 This algorithm was developed from the basis set forth in Bonin et al. (2018):
@@ -15,6 +15,8 @@ Journal of Atmospheric and Oceanic Technology, 35(3), 473-490. https://doi.org/1
 While the algorithm was developed for Doppler wind lidar and AERI retrieval profiles, it could likey be adapted for other combinations of boundary layer wind and thermodynamic profile observations.
 
 The CLAMPS platform is maintained by a collaborative team at the University of Oklahoma and the NOAA National Severe Storms Laboratory. You can learn more about CLAMPS, the instruments onboard, contacts, and more at https://apps.nssl.noaa.gov/CLAMPS/
+
+The authors acknowledge Dr. Tim Bonin (MIT Lincoln Labs), Tyler Bell (OU CIMMS / NSSL) and Joshua Gebauer (NCAR EOL) for contributions and insights.
 
 ## Dependent Packages
 
