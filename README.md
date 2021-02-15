@@ -17,15 +17,16 @@ While the algorithm was developed for Doppler wind lidar and AERI retrieval prof
 The CLAMPS platform is maintained by a collaborative team at the University of Oklahoma and the NOAA National Severe Storms Laboratory. You can learn more about CLAMPS, the instruments onboard, contacts, and more at https://apps.nssl.noaa.gov/CLAMPS/
 
 ## Dependent Packages
-*cmocean -- could skip/remove in plotting
-*datetime
-*matplotlib
-*netCDF4
-*numpy
-*pandas
-*scipy
-*siphon -- could skip/remove if working with local files only
-*suntime
+
+- cmocean -- could skip/remove in plotting
+- datetime
+- matplotlib
+- netCDF4
+- numpy
+- pandas
+- scipy
+- siphon -- could skip/remove if working with local files only
+- suntime
 
 ## Output
 
