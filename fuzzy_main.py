@@ -17,11 +17,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from scipy.interpolate import RegularGridInterpolator
+from scipy.special import erf
 import scipy.optimize as sp
 import scipy.signal as ss
 import pandas as pd
 from siphon.catalog import TDSCatalog
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from suntime import Sun
 import cmocean as cm
 
@@ -31,9 +32,7 @@ plt.style.use('bmh')
 plt.rcParams['font.size'] = 16
 x_tick_labels = ['00','03','06','09','12','15','18','21']
 
-##################################################################################################################
-
-
+#################################################################################################################
 
 #########################################################
 #FUNCTIONS
@@ -789,126 +788,62 @@ def lenshowVar(time, height, vertvel, intensity, window=.25):
 #siphon THREDDS for PBLTOPS
 ##################################################################################################################
 
-# #Catalog for the CLAMPS2 stares
-# STRcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps2/oun/stare/catalog.xml"
-# #Open the catalog
-# STRcat = TDSCatalog(STRcatURL)
-# # Print some of the datasets
-# #print(STRcat.datasets[:])
-# # Get the dates for all the netCDF datasets
-# #STRnc_dates = np.array([datetime.strptime(ds, "clampsdlfpC1.b1.%Y%m%d.%H%M%S.cdf") for ds in STRcat.datasets if '.cdf' in ds])
-# # Find the index of the date we want
-# #ind = np.argmin(np.abs(dt - STRnc_dates))
-# # Get the dataset
-# #STRds = STRcat.datasets[ind]
+#Catalog for the CLAMPS2 stares
+STRcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/kaefs/stare/catalog.xml"
+#Open the catalog
+STRcat = TDSCatalog(STRcatURL)
+# Print some of the datasets
+#print(STRcat.datasets[:])
+# Get the dates for all the netCDF datasets
+#STRnc_dates = np.array([datetime.strptime(ds, "clampsdlfpC1.b1.%Y%m%d.%H%M%S.cdf") for ds in STRcat.datasets if '.cdf' in ds])
+# Find the index of the date we want
+#ind = np.argmin(np.abs(dt - STRnc_dates))
+# Get the dataset
+#STRds = STRcat.datasets[ind]
 
 
-# # Catalog for the CLAMPS2 VADs
-# VADcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps2/oun/vad/catalog.xml"
-# # Open the catalog
-# VADcat = TDSCatalog(VADcatURL)
-# # Print some of the datasets
-# #print(VADcat.datasets[:])
-# # Get the dates for all the netCDF datasets
-# #VADnc_dates = np.array([datetime.strptime(".".join(ds.split['.'][-3:-1]), "%Y%m%d.%H%M%S") for ds in VADcat.datasets if '.cdf' in ds])
-# # Find the index of the date we want
-# #ind = np.argmin(np.abs(dt - VADnc_dates))
-# # Get the dataset
-# #VADds = VADcat.datasets[ind]
+# Catalog for the CLAMPS2 VADs
+VADcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/kaefs/vad/catalog.xml"
+# Open the catalog
+VADcat = TDSCatalog(VADcatURL)
+# Print some of the datasets
+#print(VADcat.datasets[:])
+# Get the dates for all the netCDF datasets
+#VADnc_dates = np.array([datetime.strptime(".".join(ds.split['.'][-3:-1]), "%Y%m%d.%H%M%S") for ds in VADcat.datasets if '.cdf' in ds])
+# Find the index of the date we want
+#ind = np.argmin(np.abs(dt - VADnc_dates))
+# Get the dataset
+#VADds = VADcat.datasets[ind]
 
 
-# # Catalog for the CLAMPS2 AERIoe
-# #AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps2/oun/tropoe_v1/catalog.xml"
-# AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps2/oun/aerioe/catalog.xml"
-# # Open the catalog
-# AOEcat = TDSCatalog(AOEcatURL)
-# # Print some of the datasets
-# #print(AOEcat.datasets[:])
-# # Get the dates for all the netCDF datasets
-# #AOEnc_dates = np.array([datetime.strptime(ds, "clampsaerieoe1turnC1.c1.%Y%m%d.%H%M%S.cdf") for ds in AOEcat.datasets if '.cdf' in ds])
-# # Find the index of the date we want
-# #ind = np.argmin(np.abs(dt - AOEnc_dates))
-# # Get the dataset
-# #AOEds = AOEcat.datasets[ind]
+# Catalog for the CLAMPS2 AERIoe
+#AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps2/oun/tropoe_v1/catalog.xml"
+AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/kaefs/tropoe_v1/catalog.xml"
+# Open the catalog
+AOEcat = TDSCatalog(AOEcatURL)
+# Print some of the datasets
+#print(AOEcat.datasets[:])
+# Get the dates for all the netCDF datasets
+#AOEnc_dates = np.array([datetime.strptime(ds, "clampsaerieoe1turnC1.c1.%Y%m%d.%H%M%S.cdf") for ds in AOEcat.datasets if '.cdf' in ds])
+# Find the index of the date we want
+#ind = np.argmin(np.abs(dt - AOEnc_dates))
+# Get the dataset
+#AOEds = AOEcat.datasets[ind]
 
-# stares=[]
-# vads=[]
-# rets=[]
-# for i in range(len(STRcat.datasets)):
-#     stares.append(str(STRcat.datasets[i]))
-# for i in range(len(VADcat.datasets)):
-#     vads.append(str(VADcat.datasets[i]))
-# for i in range(len(AOEcat.datasets)):
-#     rets.append(str(AOEcat.datasets[i]))
+stares=[]
+vads=[]
+rets=[]
+for i in range(len(STRcat.datasets)):
+    stares.append(str(STRcat.datasets[i]))
+for i in range(len(VADcat.datasets)):
+    vads.append(str(VADcat.datasets[i]))
+for i in range(len(AOEcat.datasets)):
+    rets.append(str(AOEcat.datasets[i]))
 
-## Build the range of dates you need to loop over    
-# dates=np.concatenate((np.arange(20200821,20200832,1),np.arange(20200900,20200931,1)))
-## Option: replace the full range with a subset for debugging or for a case specific test
-# #dates=dates[27:28] 
-
-## look for dates where Stare, VAD, and Retrieval file are all present
-# dates_flags = np.full(dates.shape, np.nan)
-# for i in range(len(dates)):
-#     if np.all([any(str(dates[i]) in string for string in stares), 
-#               any(str(dates[i]) in string for string in vads), 
-#               any(str(dates[i]) in string for string in rets)]):
-#         dates_flags[i] = True
-#     else: 
-#         dates_flags[i] = False
-
-## only operate on cases where Stare, VAD, and Retrieval file are all present
-# for case in range(0,len(dates)):#if the loop stops for whatever reason and you want to start 
-#                                 #where you left off, change 0 to whatever number
-#     Case=dates[case]
-#     if dates_flags[case]==0:
-#         print('Missing obs on '+ str(Case))
-#         continue
-#     print('PROCESSING'+str(Case))
-#     #search for correct index for each set of files
-#     idx_s = [i for i, s in enumerate(stares) if str(Case) in s][0]
-#     idx_v = [i for i, s in enumerate(vads) if str(Case) in s][0]
-#     idx_a = [i for i, s in enumerate(rets) if str(Case) in s][0]
-
-#     # grab proper info for day where Stare, VAD, and Retrieval file are all present
-#     STRds = STRcat.datasets[idx_s]
-#     VADds = VADcat.datasets[idx_v]
-#     AOEds = AOEcat.datasets[idx_a]
-#     # Modify catURL to get the dataset URLs
-#     STRdsURL = STRcatURL.replace('catalog.xml', STRds.name).replace('catalog', 'dodsC')
-#     VADdsURL = VADcatURL.replace('catalog.xml', VADds.name).replace('catalog', 'dodsC')
-#     AOEdsURL = AOEcatURL.replace('catalog.xml', AOEds.name).replace('catalog', 'dodsC')
-    #end thredds PBLtops
-    ##################################################################################################################
-    
-        
-##################################################################################################################
-#Local files
-##################################################################################################################
-
-# use this block for local file read in option
-
-import glob
-# local filepath  information
-path_to_files = '/Users/elizabeth.smith/Documents/PBLTops/data/'
-dlfp = 'clamps1/shv/stare/'
-dlvad = 'clamps1/shv/vad/'
-retrieval = 'clamps1/shv/aerioe_v0/'
-
-# path_to_files = '/Users/elizabeth.smith/Documents/CHEESEHEAD/data/'
-# dlfp = 'CLAMPS2/dlfp/'
-# dlvad = 'CLAMPS2/dlvad/'
-# retrieval = 'CLAMPS2/mwronly/'
-
-stares = glob.glob(path_to_files+dlfp+'*.cdf')
-vads = glob.glob(path_to_files+dlvad+'*.cdf')
-rets = glob.glob(path_to_files+retrieval+'*.cdf')
-
-# Build the range of dates you need to loop over
-dates=np.concatenate((np.arange(20200824,20200832,1),np.arange(20200900,20200931,1))) #PBL TOPS
-#dates = np.concatenate((np.arange(20190919,20190931,1),np.arange(20191001,20191012,1))) #CHEESEHEAD
-
+# Build the range of dates you need to loop over    
+dates=np.concatenate((np.arange(20200821,20200832,1),np.arange(20200900,20200931,1)))
 # Option: replace the full range with a subset for debugging or for a case specific test
-#dates = dates[1:6] #aug25-29
+#dates=dates[27:28] 
 
 # look for dates where Stare, VAD, and Retrieval file are all present
 dates_flags = np.full(dates.shape, np.nan)
@@ -918,10 +853,11 @@ for i in range(len(dates)):
               any(str(dates[i]) in string for string in rets)]):
         dates_flags[i] = True
     else: 
-         dates_flags[i] = False
+        dates_flags[i] = False
+
 # only operate on cases where Stare, VAD, and Retrieval file are all present
-for case in range(0,len(dates)): #if the loop stops for whatever reason and you want to start 
-                                 #where you left off, change 0 to whatever number
+for case in range(0,len(dates)):#if the loop stops for whatever reason and you want to start 
+                                #where you left off, change 0 to whatever number
     Case=dates[case]
     if dates_flags[case]==0:
         print('Missing obs on '+ str(Case))
@@ -932,13 +868,76 @@ for case in range(0,len(dates)): #if the loop stops for whatever reason and you 
     idx_v = [i for i, s in enumerate(vads) if str(Case) in s][0]
     idx_a = [i for i, s in enumerate(rets) if str(Case) in s][0]
 
-    STRds = stares[idx_s]
-    VADds = vads[idx_v]
-    AOEds = rets[idx_a]
     # grab proper info for day where Stare, VAD, and Retrieval file are all present
-    STRdsURL = STRds
-    VADdsURL = VADds
-    AOEdsURL = AOEds
+    STRds = STRcat.datasets[idx_s]
+    VADds = VADcat.datasets[idx_v]
+    AOEds = AOEcat.datasets[idx_a]
+    # Modify catURL to get the dataset URLs
+    STRdsURL = STRcatURL.replace('catalog.xml', STRds.name).replace('catalog', 'dodsC')
+    VADdsURL = VADcatURL.replace('catalog.xml', VADds.name).replace('catalog', 'dodsC')
+    AOEdsURL = AOEcatURL.replace('catalog.xml', AOEds.name).replace('catalog', 'dodsC')
+    #end thredds PBLtops
+    #################################################################################################################
+    
+        
+##################################################################################################################
+#Local files
+##################################################################################################################
+
+# use this block for local file read in option
+
+# import glob
+# # local filepath  information
+# path_to_files = '/Users/elizabeth.smith/Documents/PBLTops/data/'
+# dlfp = 'clamps1/shv/stare/'
+# dlvad = 'clamps1/shv/vad/'
+# retrieval = 'clamps1/shv/aerioe_v0/'
+
+# # path_to_files = '/Users/elizabeth.smith/Documents/CHEESEHEAD/data/'
+# # dlfp = 'CLAMPS2/dlfp/'
+# # dlvad = 'CLAMPS2/dlvad/'
+# # retrieval = 'CLAMPS2/mwronly/'
+
+# stares = glob.glob(path_to_files+dlfp+'*.cdf')
+# vads = glob.glob(path_to_files+dlvad+'*.cdf')
+# rets = glob.glob(path_to_files+retrieval+'*.cdf')
+
+# # Build the range of dates you need to loop over
+# dates=np.concatenate((np.arange(20200824,20200832,1),np.arange(20200900,20200931,1))) #PBL TOPS
+# #dates = np.concatenate((np.arange(20190919,20190931,1),np.arange(20191001,20191012,1))) #CHEESEHEAD
+
+# # Option: replace the full range with a subset for debugging or for a case specific test
+# #dates = dates[1:6] #aug25-29
+
+# # look for dates where Stare, VAD, and Retrieval file are all present
+# dates_flags = np.full(dates.shape, np.nan)
+# for i in range(len(dates)):
+#     if np.all([any(str(dates[i]) in string for string in stares), 
+#               any(str(dates[i]) in string for string in vads), 
+#               any(str(dates[i]) in string for string in rets)]):
+#         dates_flags[i] = True
+#     else: 
+#          dates_flags[i] = False
+# # only operate on cases where Stare, VAD, and Retrieval file are all present
+# for case in range(0,len(dates)): #if the loop stops for whatever reason and you want to start 
+#                                  #where you left off, change 0 to whatever number
+#     Case=dates[case]
+#     if dates_flags[case]==0:
+#         print('Missing obs on '+ str(Case))
+#         continue
+#     print('PROCESSING'+str(Case))
+#     #search for correct index for each set of files
+#     idx_s = [i for i, s in enumerate(stares) if str(Case) in s][0]
+#     idx_v = [i for i, s in enumerate(vads) if str(Case) in s][0]
+#     idx_a = [i for i, s in enumerate(rets) if str(Case) in s][0]
+
+#     STRds = stares[idx_s]
+#     VADds = vads[idx_v]
+#     AOEds = rets[idx_a]
+#     # grab proper info for day where Stare, VAD, and Retrieval file are all present
+#     STRdsURL = STRds
+#     VADdsURL = VADds
+#     AOEdsURL = AOEds
     
     
     
@@ -968,13 +967,13 @@ for case in range(0,len(dates)): #if the loop stops for whatever reason and you 
     contact_list = 'elizabeth.smith@noaa.gov; jacob.carlin@noaa.gov'
     campaign = 'PBLTops2020'
     
-    sun_lat = C1_pblkshv_lat
-    sun_lon = C1_pblkshv_lon
+    sun_lat = C2_pblkoun_lat
+    sun_lon = C2_pblkoun_lon
     
     
     #files
-    path_to_write = '/Users/elizabeth.smith/Documents/PBLTops/output_files/'
-    path_to_plots = '/Users/elizabeth.smith/Documents/PBLTops/plots/'
+    path_to_write = '/Users/jacob.carlin/Documents/Data/PBL Tops/test/'
+    path_to_plots = '/Users/jacob.carlin/Documents/Data/PBL Tops/test/'
     # path_to_write = '/Users/elizabeth.smith/Documents/CHEESEHEAD/PBLTopFuzzy/output_files/'
     # path_to_plots = '/Users/elizabeth.smith/Documents/CHEESEHEAD/PBLTopFuzzy/'
     
@@ -1178,30 +1177,53 @@ for case in range(0,len(dates)): #if the loop stops for whatever reason and you 
     
     # Compute time-weighted membership function for incorporating AERI data
     sun = Sun(sun_lat, sun_lon) #sun for given lat lon, "actual code" block
-    sunup = sun.get_sunrise_time(timestamp).replace(tzinfo=timezone.utc).timestamp()-base_time
-    sundown = sun.get_sunset_time(timestamp).replace(tzinfo=timezone.utc).timestamp()-base_time
-    sunup_hr = sunup/3600.
-    sundown_hr = sundown/3600.
+    sunup = sun.get_sunrise_time(timestamp).replace(tzinfo=timezone.utc).timestamp()
+    sundown = sun.get_sunset_time(timestamp).replace(tzinfo=timezone.utc).timestamp()
+    prev_sundown = sun.get_sunset_time(timestamp - timedelta(days=1)).replace(tzinfo=timezone.utc).timestamp()
+    next_sundown = sun.get_sunset_time(timestamp + timedelta(days=1)).replace(tzinfo=timezone.utc).timestamp()
     
-    # using sunrise/sunset times for location to build weighting. Weights will begin to increase 2 hour
-    # prior to sunset and reach 0 1 hour after sunrise. logic deals with crossing zero. 
-    membership_time_vec = np.arange(0, 24.1, .16666) #ten minute res
-    membership_value_vec = np.full(membership_time_vec.shape, 2) # initially setting them all to max value 2
-    sunup_idx = np.where(membership_time_vec>sunup_hr)[0][0] #find where in the time vector the sun rises
-    sundown_idx = np.where(membership_time_vec>sundown_hr)[0][0] #find where the sun sets
-    firstnight_idx = min(0,abs(sundown_idx-12)) #either first index or 2 hours pre-sunset (6 10-min steps = 1 hr, 12=2hr)
-    # if it is the later the abs has no effect, if it is the former, the abs ignores negative vals from -12
-    if firstnight_idx == 0:
-        firstnight_idx = len(membership_time_vec)+(sundown_idx-12) #sundown_idx-12 should be a neg value representing
-        # the number of indicies "past" zero needed to form two hours pre sunset. We apply those to the end of the time.
-    lastnight_idx =  sunup_idx + 6 # 1hr after sunrise
-    membership_value_vec[lastnight_idx:firstnight_idx+1]=0
-    # start tapering 30 min prior to sunrise
-    membership_value_vec[sunup_idx-3:lastnight_idx]=np.linspace(2,0,num=len(membership_value_vec[sunup_idx-3:lastnight_idx]))
-    # end tapering 30 min after sundown or to the end of the series if that is after 0 
-    membership_value_vec[firstnight_idx:max(len(membership_time_vec),sundown_idx+4)]=np.linspace(0,2,num=len(membership_value_vec[firstnight_idx:max(len(membership_time_vec),sundown_idx+4)]))
+    membership_times = np.arange(base_time, base_time+87000, 600)
+    membership_value_vec = np.full(len(membership_times), np.nan)
+    transition_half_window = 3600 # 30-min [in s] for a 1-h total transition window centered on sunup/sundown
+    
+    # Nighttime
+    if sundown < sunup:
+        g = np.where(np.logical_and(membership_times > (sundown + transition_half_window),
+                                    membership_times < (sunup - transition_half_window)))
+    else: # sunrise for date comes first
+        g = np.where(np.logical_and(membership_times > (prev_sundown + transition_half_window),
+                                   membership_times < (sunup - transition_half_window)))
+    membership_value_vec[g] = 2.0 
+    
+    
+    # Daytime
+    if sundown < sunup:
+        g = np.where(np.logical_and(membership_times < (next_sundown - transition_half_window),
+                                   membership_times > (sunup + transition_half_window)))
+    else:
+        g = np.where(np.logical_and(membership_times < (sundown - transition_half_window),
+                                   membership_times > (sunup + transition_half_window)))    
+    membership_value_vec[g] = 0.0 
+    
+    # Transition zones
+    # Dawn
+    g = np.where(np.abs(membership_times - sunup) <= transition_half_window)[0]
+    membership_value_vec[g] = -erf((membership_times[g] - sunup) / 1200.) + 1.0 
+    # 1200.0 (20-min periods) gets to vals = (0, 2) at (-1 hr, +1 hr)
+    
+    # Dusk
+    g = np.where(np.abs(membership_times - sundown) <= transition_half_window)[0]
+    membership_value_vec[g] = erf((membership_times[g] - sundown) / 1200.) + 1.0
+    
+    g = np.where(np.abs(membership_times - next_sundown) <= transition_half_window)[0]
+    membership_value_vec[g] = erf((membership_times[g] - next_sundown) / 1200.) + 1.0
+    
+    g = np.where(np.abs(membership_times - prev_sundown) <= transition_half_window)[0]
+    membership_value_vec[g] = erf((membership_times[g] - prev_sundown) / 1200.) + 1.0
+    
+    
     # interpolating
-    f = interp1d(membership_time_vec*60., membership_value_vec)
+    f = interp1d((membership_times - base_time)/60., membership_value_vec) # Convert time to minutes vec
     # compute the T gradient in an array
     T_grad=np.full(T.shape,np.nan)
     T_grad[:,:-1]=np.diff(T,axis=1) #vertical temperature gradients
@@ -1468,10 +1490,14 @@ for case in range(0,len(dates)): #if the loop stops for whatever reason and you 
     BLhgt_2_sm, BLhgt_2_sm_range = BLhgtFiltSmooth(BLhgt_2, window=7)
     BLhgt_om2_sm, BLhgt_om2_sm_range = BLhgtFiltSmooth(BLhgt_om2, window=7)
     BLhgt_ob2_sm, BLhgt_ob2_sm_range = BLhgtFiltSmooth(BLhgt_ob2, window=7)
-    if x[-1]/60.>sunup_hr: # if there are enough data to care about cutting the overnight terms off
-        cut_start = np.where(x/60>sunup_hr)[0][0] 
-        if sundown_hr<23.5:
-            cut_end = np.where(x/60>sundown_hr)[0][0]+1
+    
+    sunup_min = (sunup - base_time)/60.
+    sundown_min = (sundown - base_time)/60.
+    
+    if x[-1] > sunup_min: # if there are enough data to care about cutting the overnight terms off
+        cut_start = np.where(x > sunup_min)[0][0] 
+        if sundown_min < 1410.: # 23:30 Z
+            cut_end = np.where(x > sundown_min)[0][0]+1
         else: #if sundown is inbetween 23:30 and 00Z
             cut_end = len(x)-1
         if cut_end < cut_start: #sunset is after 0
