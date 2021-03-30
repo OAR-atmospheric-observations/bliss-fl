@@ -20,15 +20,15 @@ The authors acknowledge Dr. Tim Bonin (MIT Lincoln Labs), Tyler Bell (OU CIMMS /
 
 ## Dependent Packages
 
-- cmocean -- could skip/remove in plotting
+- cmocean -- could skip/remove in plotting; https://github.com/matplotlib/cmocean
 - datetime
 - matplotlib
 - netCDF4
 - numpy
 - pandas
 - scipy
-- siphon -- could skip/remove if working with local files only
-- suntime
+- siphon -- could skip/remove if working with local files only; https://www.unidata.ucar.edu/software/siphon/; can install via conda forge
+- suntime -- pip3: https://pypi.org/project/suntime/
 
 ## Output
 
