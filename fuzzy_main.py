@@ -1182,6 +1182,19 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     prev_sundown = sun.get_sunset_time(timestamp - timedelta(days=1)).replace(tzinfo=timezone.utc).timestamp()
     next_sundown = sun.get_sunset_time(timestamp + timedelta(days=1)).replace(tzinfo=timezone.utc).timestamp()
     
+    real_sunup = sunup
+    real_sundown = sundown
+    real_prev_sundown = prev_sundown
+    real_next_sundown = next_sundown
+
+    sunup_offset = -20 * 60.
+    sundown_offset = -20 * 60.
+    
+    sunup += sunup_offset
+    sundown += sundown_offset
+    prev_sundown += sundown_offset
+    next_sundown += sundown_offset
+    
     membership_times = np.arange(base_time, base_time+87000, 600)
     membership_value_vec = np.full(len(membership_times), np.nan)
     transition_half_window = 3600 # 30-min [in s] for a 1-h total transition window centered on sunup/sundown
@@ -1575,7 +1588,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         plt.plot(x/60.,BLhgt_2_sm,color='k',lw=2,label='PBLH')
         plt.ylim(0.06,2.75)
         plt.xticks(np.arange(0,24.1,3))
-        plt.xlim(0.0,23)
+        plt.xlim(0.0,24)
         plt.xlabel('Hour [UTC]')
         plt.ylabel(' Height AGL [km]')
         plt.title(str(platform)+' '+str(date_label))
@@ -1616,7 +1629,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         plt.colorbar(label='Temperature gradient [C]')
         plt.ylim(0.06,2.75)
         plt.xticks(np.arange(0,24.1,3))
-        plt.xlim(0.0,23)
+        plt.xlim(0.0,24)
         plt.xlabel('Hour [UTC]')
         plt.ylabel(' Height AGL [km]')
         # plt.plot(x/60.,BLhgt_sm,'w',lw=3)
@@ -1642,7 +1655,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         plt.colorbar(label='WV Mixing Ratio')
         plt.ylim(0.06,2.75)
         plt.xticks(np.arange(0,24.1,3))
-        plt.xlim(0.0,23)
+        plt.xlim(0.0,24)
         plt.xlabel('Hour [UTC]')
         plt.ylabel(' Height AGL [km]')
         plt.title(str(platform)+' '+str(date_label))
@@ -1669,7 +1682,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         ax.plot(x/60.,BLhgt_om2_sm, 'co',lw=None, label='2nd Gen Mech')
         ax.plot(x/60.,BLhgt_ob2_sm, 'mo', lw=None, label='2nd Gen Buoy')
         plt.legend()
-        plt.xlim(0,23)
+        plt.xlim(0,24)
         plt.ylim(0.06,2.75)
         if show_me == True:
             plt.show()
