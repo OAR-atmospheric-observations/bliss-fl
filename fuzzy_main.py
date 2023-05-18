@@ -5,9 +5,10 @@ Created on Jan 5 2021
 @author: elizabeth.smith/jacob.carlin
 """
 """
-This is a starter code from ES's read-in/plotter script. We are collaborating now to 
-convert code(s) shared by Tim Bonin from matlab to python for our needs. Tim's code(s)
-help us build the fuzzy logic algorithm we want to apply to our PBLTops datasets!
+This is a multi-instrument fuzzy logic PBL height detection algorithm developed
+for using CLAMPS Doppler wind lidar and thermodynamic (AERI) profiles. This 
+algorithm was developed from the basis set forth in Bonin et al. (2018).
+ https://doi.org/10.1175/JTECH-D-17-0159.1
 """
 #########################################################
 #All the imports
@@ -44,7 +45,7 @@ x_tick_labels = ['00','03','06','09','12','15','18','21','00']
 def calcSigma(stare_t, stare_z, stare_field, window=.25):
     """
     This function computes the variance of a field within a specified time window.
-    Adapted from existing ES code for variance of CLAMPS data.
+    Adapted from existing ESmith code for variance of CLAMPS data.
     
     Args:
         stare_t (array): 1-D array of times [hr]
@@ -234,7 +235,8 @@ def HF_varcalc(field, time, height):
       field_nan[np.isnan(field[:, i])] = 0.0
       filt = ss.filtfilt(b, a, field_nan)      
       filt_field[:, i] = field[:, i] - filt
-  HFsigw, HFsigw_t = calcSigma(time, height, filt_field, window=0.166) #computing the vertical velocity variance from raw w in 5 min=.083 (10=0.166)windows
+  HFsigw, HFsigw_t = calcSigma(time, height, filt_field, window=0.166) #computing the 
+  # vertical velocity variance from raw w in 5 min=.083 (10=0.166)windows
   HFsigw[np.where(HFsigw > 5)] = np.nan
   return filt_field, HFsigw, HFsigw_t
   
@@ -323,6 +325,8 @@ def fuzzGrid(input_var, input_x, input_y, start_time=0., end_time=1440., low_z =
 ##########################################################
 
 
+
+##########################################################
 def run_haar_wavelet(profile, z, haarDilationLength=100):
   """
   Perform a Haar wavelet analysis on a given profile at heights z.
@@ -526,7 +530,8 @@ def findBLhgt(BL_logical,gate_min):
 ##########################################################
 def xcorr(x, y, scale='none'):
     """
-    This function comes from Tyler Bell and computes a correlation between x and y.
+    This function comes from Tyler Bell (CIWRO/NSSL) and computes a 
+    correlation between x and y.
     
     Args:
       x (array): values for correlation calculation
@@ -562,8 +567,9 @@ def xcorr(x, y, scale='none'):
 ##########################################################        
 def lenshow(x, freq=1, tau_min=3, tau_max=12, plot=False):
     """
-    This function comes from Tyler Bell     
-    Reads in a timeseries. Freq is in Hz. Default taus are from avg values from Bonin Dissertation (2015)
+    This function comes from Tyler Bell (CIWRO/NSSL)    
+    Reads in a timeseries. Freq is in Hz. Default taus are from avg values 
+    from Bonin Dissertation (2015)
     Returns avg w'**2 and avg error'**2
     """
     # Find the perturbation of x
@@ -602,7 +608,6 @@ def lenshowVar(time, height, vertvel, intensity, window=.25):
     This function applied the Lenshow method to vertical velocity data. Calls
     Tyler Bell's lenshow function (which calls his correlate fucntion). Note 
     vertical velocity data should not be filtered/have nans yet
-    Add reference information
     
     Args:
         time (array): 1-D array of times
@@ -647,14 +652,16 @@ def lenshowVar(time, height, vertvel, intensity, window=.25):
             if np.isnan(work_data).all():
                 prev_idx = last[-1]
                 continue
-            # Use the lenshow method which is inside Tyler Bell's function. We only want the first return (2nd is avg w)
+            # Use the lenshow method which is inside Tyler Bell's function. 
+            # We only want the first return (2nd is avg w)
             std = lenshow(work_data)[0]
             lenshow_sigw[i,j]=std
             # set the first index for the next step to the current last index
             prev_idx = last_idx
     
     # now we want to filter the output of the lenshow-ed vert velocity by SNR
-    # this cutoff value is hardcoded and less restrictive than usual since lenshow already does some 'filtering' of its own in effect
+    # this cutoff value is hardcoded and less restrictive than usual since 
+    # lenshow already does some 'filtering' of its own in effect
     lenshow_sigw[np.where(snr_l<1.0075)] = np.nan
     
     return lenshow_sigw, lenshow_t
@@ -669,7 +676,7 @@ def lenshowVar(time, height, vertvel, intensity, window=.25):
 
 
 ##################################################################################################################    
-#siphon THREDDS for CHEESEHEAD
+#siphon THREDDS for in this case CHEESEHEAD or NWCRIL deployments
 ##################################################################################################################
 
 # Catalog for the CLAMPS2 stares
@@ -728,10 +735,9 @@ for i in range(len(AOEcat.datasets)):
     rets.append(str(AOEcat.datasets[i]))
    
 # Build the range of dates you need to loop over    
-dates = np.arange(20200625,20200626,1)
-#dates=np.concatenate((np.arange(20200604,20200631,1),np.arange(20200700,20200732,1),np.arange(20200800,20200811,1)))
-#dates=np.concatenate((np.arange(20190925,20190931,1),np.arange(20191000,20191002,1)))
-#dates=np.concatenate((np.arange(20190923,20190931,1),np.arange(20191000,20191002,1)))
+
+dates=np.concatenate((np.arange(20200604,20200631,1),np.arange(20200700,20200732,1),np.arange(20200800,20200811,1)))
+
 # Option: replace the full range with a subset for debugging or for a case specific test
 #dates=dates[8:9] 
 
@@ -745,14 +751,14 @@ for i in range(len(dates)):
     else: 
         dates_flags[i] = False
         
-#repeat to toss bad files (non .cdf)
+#repeat to toss bad or extraneous files (non .cdf)
 stares=[]
 vads=[]
 rets=[]
 indexing_original_cats = []
 count = 0
 for i in range(len(STRcat.datasets)):
-    if str(STRcat.datasets[i])[-3:]=='cdf': #ignore png/pdf files in directory
+    if str(STRcat.datasets[i])[-3:]=='cdf': #ignore png/pdf etc files in directory
         stares.append(str(STRcat.datasets[i]))
         count=count+1
         if count<2:
@@ -773,8 +779,8 @@ for i in range(len(AOEcat.datasets)):
             indexing_original_cats.append(i)
 
 # only operate on cases where Stare, VAD, and Retrieval file are all present
-for case in range(0,len(dates)):#if the loop stops for whatever reason and you want to start 
-                                #where you left off, change 0 to whatever number
+for case in range(0,len(dates)):# if the loop stops for whatever reason and you want to start 
+                                # where you left off, change 0 to whatever number
     Case=dates[case]
     if dates_flags[case]==0:
         print('Missing obs on '+str(Case))
@@ -794,104 +800,8 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     VADdsURL = VADcatURL.replace('catalog.xml', VADds.name).replace('catalog', 'dodsC')
     AOEdsURL = AOEcatURL.replace('catalog.xml', AOEds.name).replace('catalog', 'dodsC')
 
-    #end thredds CHEESHEAD
+    #end thredds 
     ##################################################################################################################
-    
-    
-##################################################################################################################    
-#siphon THREDDS for PBLTOPS
-##################################################################################################################
-
-# #Catalog for the CLAMPS2 stares
-# STRcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/shv/stare/catalog.xml"
-# #Open the catalog
-# STRcat = TDSCatalog(STRcatURL)
-# # Print some of the datasets
-# #print(STRcat.datasets[:])
-# # Get the dates for all the netCDF datasets
-# #STRnc_dates = np.array([datetime.strptime(ds, "clampsdlfpC1.b1.%Y%m%d.%H%M%S.cdf") for ds in STRcat.datasets if '.cdf' in ds])
-# # Find the index of the date we want
-# #ind = np.argmin(np.abs(dt - STRnc_dates))
-# # Get the dataset
-# #STRds = STRcat.datasets[ind]
-
-
-# # Catalog for the CLAMPS2 VADs
-# VADcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/shv/vad/catalog.xml"
-# # Open the catalog
-# VADcat = TDSCatalog(VADcatURL)
-# # Print some of the datasets
-# #print(VADcat.datasets[:])
-# # Get the dates for all the netCDF datasets
-# #VADnc_dates = np.array([datetime.strptime(".".join(ds.split['.'][-3:-1]), "%Y%m%d.%H%M%S") for ds in VADcat.datasets if '.cdf' in ds])
-# # Find the index of the date we want
-# #ind = np.argmin(np.abs(dt - VADnc_dates))
-# # Get the dataset
-# #VADds = VADcat.datasets[ind]
-
-
-# # Catalog for the CLAMPS2 AERIoe
-# #AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps2/oun/tropoe_v1/catalog.xml"
-# AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/shv/tropoe_v2/aerimwr/catalog.xml"
-# # Open the catalog
-# AOEcat = TDSCatalog(AOEcatURL)
-# # Print some of the datasets
-# #print(AOEcat.datasets[:])
-# # Get the dates for all the netCDF datasets
-# #AOEnc_dates = np.array([datetime.strptime(ds, "clampsaerieoe1turnC1.c1.%Y%m%d.%H%M%S.cdf") for ds in AOEcat.datasets if '.cdf' in ds])
-# # Find the index of the date we want
-# #ind = np.argmin(np.abs(dt - AOEnc_dates))
-# # Get the dataset
-# #AOEds = AOEcat.datasets[ind]
-
-# stares=[]
-# vads=[]
-# rets=[]
-# for i in range(len(STRcat.datasets)):
-#     stares.append(str(STRcat.datasets[i]))
-# for i in range(len(VADcat.datasets)):
-#     vads.append(str(VADcat.datasets[i]))
-# for i in range(len(AOEcat.datasets)):
-#     rets.append(str(AOEcat.datasets[i]))
-
-# # Build the range of dates you need to loop over    
-# dates=np.concatenate((np.arange(20200821,20200832,1),np.arange(20200900,20200931,1)))
-# # Option: replace the full range with a subset for debugging or for a case specific test
-# #dates=dates[27:28] 
-
-# # look for dates where Stare, VAD, and Retrieval file are all present
-# dates_flags = np.full(dates.shape, np.nan)
-# for i in range(len(dates)):
-#     if np.all([any(str(dates[i]) in string for string in stares), 
-#               any(str(dates[i]) in string for string in vads), 
-#               any(str(dates[i]) in string for string in rets)]):
-#         dates_flags[i] = True
-#     else: 
-#         dates_flags[i] = False
-
-# # only operate on cases where Stare, VAD, and Retrieval file are all present
-# for case in range(0,len(dates)):#if the loop stops for whatever reason and you want to start 
-#                                 #where you left off, change 0 to whatever number
-#     Case=dates[case]
-#     if dates_flags[case]==0:
-#         print('Missing obs on '+ str(Case))
-#         continue
-#     print('PROCESSING'+str(Case))
-#     #search for correct index for each set of files
-#     idx_s = [i for i, s in enumerate(stares) if str(Case) in s][0]
-#     idx_v = [i for i, s in enumerate(vads) if str(Case) in s][0]
-#     idx_a = [i for i, s in enumerate(rets) if str(Case) in s][0]
-
-#     # grab proper info for day where Stare, VAD, and Retrieval file are all present
-#     STRds = STRcat.datasets[idx_s]
-#     VADds = VADcat.datasets[idx_v]
-#     AOEds = AOEcat.datasets[idx_a]
-#     # Modify catURL to get the dataset URLs
-#     STRdsURL = STRcatURL.replace('catalog.xml', STRds.name).replace('catalog', 'dodsC')
-#     VADdsURL = VADcatURL.replace('catalog.xml', VADds.name).replace('catalog', 'dodsC')
-#     AOEdsURL = AOEcatURL.replace('catalog.xml', AOEds.name).replace('catalog', 'dodsC')
-#     #end thredds PBLtops
-    #################################################################################################################
     
         
 ##################################################################################################################
@@ -966,6 +876,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     show_me = True # set to true to show plots. Set to false to save plots
     write_me = False # set to true to write out final PBL height info to netcdf
     
+    #lat/lon points for easy use (can also be wise and grab these from data files...)
     C1_cheese_lat = 45.92
     C1_cheese_lon = -89.73
     C2_cheese_lat = 45.54
@@ -983,34 +894,25 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     contact_list = 'elizabeth.smith@noaa.gov; jacob.carlin@noaa.gov'
     campaign = 'NWCRIL2020'
     
+    #need the location information to determine when the sun is up and down
     sun_lat = NWC_lat
     sun_lon = NWC_lon
     
     
     #files
-   # path_to_write = '/Users/jacob.carlin/Documents/Data/PBL Tops/test/'
-   # path_to_plots = '/Users/jacob.carlin/Documents/Data/PBL Tops/test/'
-    # path_to_write = '/Users/elizabeth.smith/Documents/PBLTops/output_files/V3/'
-    # path_to_plots = '/Users/elizabeth.smith/Documents/PBLTops/plots/V3/'
-    #path_to_write = '/Users/elizabeth.smith/Documents/CHEESEHEAD/PBLTopFuzzy/CLAMPS1_Lakeland/output_files/V3/C1MWRonly/'
-    #path_to_plots = '/Users/elizabeth.smith/Documents/CHEESEHEAD/PBLTopFuzzy/CLAMPS1_Lakeland/quicklook_images/V3/C1MWRonly/'
     path_to_write = '/Users/elizabeth.smith/Documents/PBLTops/NWCRILout/files/'
     path_to_plots = '/Users/elizabeth.smith/Documents/PBLTops/NWCRILout/plots/'
     
     #stares
     date_files = STRdsURL
-    #date_files = path_to_files+'clampsdlfpC1.b1.20200920.000017.cdf'
-    #date_files = path_to_files+'clampsdlfpC2.b1.20200915.000000.cdf'
-    
+   
     #vads
     date_filev = VADdsURL
-    #date_filev = path_to_files+'clampsdlvad1turnC1.c1.20200920.000859.cdf'
-    #date_filev = path_to_files+'clampsdlvadC2.c1.20200915.000000.cdf'
+  
     #%%
     #aeri retrievals 
     date_filea = AOEdsURL
-    #data_filea = path_to_files+'clampsaerioe1turnC1.c1.20200920.001005.cdf'
-    #data_filea = path_to_files+'clampsaerioe1turnC2.c1.20200915.152005.cdf'
+    
     
     # label text for plots/save names
     date_label = date_files[-19:-11]
@@ -1094,9 +996,9 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     
     
     # Cleaning up files with weird timestamps and bad retrievals (hard target scans)
-    stupid = any(np.ediff1d(t_v) < 0)
-    while stupid:
-        #while there are any stupid negative time differences
+    problem = any(np.ediff1d(t_v) < 0)
+    while problem:
+        #while there are any problematic negative time differences
         g = np.where(np.ediff1d(t_v) < 0)[0] + 1 # Find times that differ from regular 10-min intervals
         snrv = np.delete(snrv, g, 0)
         ws = np.delete(ws, g, 0)
@@ -1105,7 +1007,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         v = np.delete(v, g, 0)
         HRv = np.delete(HRv, g)
         t_v = np.delete(t_v, g)
-        stupid = any(np.ediff1d(t_v) < 0)
+        problem = any(np.ediff1d(t_v) < 0)
     
     
     print('VAD read in complete')
@@ -1293,6 +1195,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         inv_fuzz_wt[i, :] = f(x[i]) # apply weighting as defined above
         inversion.append(y[inversion_idx])
     
+    # visualize Inversion Weighting and the sunset/rise times
     plt.figure(figsize=(18,6))
     plt.plot((membership_times-base_time)/3600.,membership_value_vec, lw=6, color='k',label='Inversion Weight')
     plt.axvline((real_sunup-base_time)/3600.,ls='--',color='grey')
@@ -1306,6 +1209,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     plt.ylabel('Height AGL [km]')
     plt.show()
     
+    # visualize Inversion Height and the sunset/sunrsise times
     plt.figure(figsize=(18,6))
     plt.plot(x/60.,inversion, lw=6, color='k',label='Inversion Height')
     plt.axvline((real_sunup-base_time)/3600.,ls='--',color='grey')
@@ -1554,6 +1458,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     sunup_min = (sunup - base_time)/60.
     sundown_min = (sundown - base_time)/60.
     #%%
+    # Deal with files that may be less than 24 hours long
     if x[-1] > sunup_min: # if there are enough data to care about cutting the overnight terms off
         cut_start = np.where(x > sunup_min)[0][0] 
         if sundown_min < 1410.: # 23:30 Z
@@ -1806,7 +1711,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         
         
         
-        # # #T grad
+        # # #T grad (actually differences)
         # plt.figure(figsize=(18,6))
         # plt.pcolormesh(HRa,Za,T_grad.transpose(),vmin=-1,vmax=1,cmap=cm.cm.delta)
         # plt.colorbar(label='Temperature gradient [C]')
