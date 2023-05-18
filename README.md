@@ -38,6 +38,8 @@ If `plot_me=True`, several figures are generated. If `show_me=True`, they will p
 ### Optional netCDF writeout
 If `write_me=True` the resulting PBL height estimates will be written out to a netcdf file and saved to the user provides save location. 
 
+## Algorithm Flowchart
 
+![Fuzzy_flowchart](https://user-images.githubusercontent.com/47791747/146992157-b1330260-4cb4-4a18-b5a9-be8f4ad11abc.png)
 
  
