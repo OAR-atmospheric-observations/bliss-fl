@@ -30,7 +30,8 @@ import cmocean as cm
 plt.style.use('bmh')
 #this is making the font big enough to read
 plt.rcParams['font.size'] = 16
-x_tick_labels = ['00','03','06','09','12','15','18','21']
+plt.rcParams['font.family'] = 'PT Sans'
+x_tick_labels = ['00','03','06','09','12','15','18','21','00']
 
 #################################################################################################################
 
@@ -485,6 +486,10 @@ def BLhgtFiltSmooth(BLhgt_vals, window=7):
     
     return BLhgt_sm, BLhgt_sm_std
 
+##########################################################
+
+
+##########################################################
 def findBLhgt(BL_logical,gate_min):
     """
     This function takes a 2 D logical array relecting BL membership in/out (1/0) status and
@@ -514,6 +519,9 @@ def findBLhgt(BL_logical,gate_min):
         else:
             BLhgt[j] = y[spots[0]]
     return BLhgt
+
+##########################################################
+
 
 ##########################################################
 def xcorr(x, y, scale='none'):
@@ -664,133 +672,10 @@ def lenshowVar(time, height, vertvel, intensity, window=.25):
 #siphon THREDDS for CHEESEHEAD
 ##################################################################################################################
 
-# # Catalog for the CLAMPS2 stares
-# STRcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/CHEESEHEAD/CLAMPS2/dlfp/catalog.xml"
-# # Open the catalog
-# STRcat = TDSCatalog(STRcatURL)
-# # Print some of the datasets
-# #print(STRcat.datasets[:])
-# # Get the dates for all the netCDF datasets
-# #STRnc_dates = np.array([datetime.strptime(ds, "clampsdlfpC1.b1.%Y%m%d.%H%M%S.cdf") for ds in STRcat.datasets if '.cdf' in ds])
-# # Find the index of the date we want
-# #ind = np.argmin(np.abs(dt - STRnc_dates))
-# # Get the dataset
-# #STRds = STRcat.datasets[ind]
-
-
-# # Catalog for the CLAMPS2 VADs
-# VADcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/CHEESEHEAD/CLAMPS2/dlvad/catalog.xml"
-# # Open the catalog
-# VADcat = TDSCatalog(VADcatURL)
-# # Print some of the datasets
-# #print(VADcat.datasets[:])
-# # Get the dates for all the netCDF datasets
-# #VADnc_dates = np.array([datetime.strptime(".".join(ds.split['.'][-3:-1]), "%Y%m%d.%H%M%S") for ds in VADcat.datasets if '.cdf' in ds])
-# # Find the index of the date we want
-# #ind = np.argmin(np.abs(dt - VADnc_dates))
-# # Get the dataset
-# #VADds = VADcat.datasets[ind]
-
-
-# # Catalog for the CLAMPS2 AERIoe
-# AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/CHEESEHEAD/CLAMPS2/mwronly/catalog.xml"
-# # Open the catalog
-# AOEcat = TDSCatalog(AOEcatURL)
-# # Print some of the datasets
-# #print(AOEcat.datasets[:])
-# # Get the dates for all the netCDF datasets
-# #AOEnc_dates = np.array([datetime.strptime(ds, "clampsaerieoe1turnC1.c1.%Y%m%d.%H%M%S.cdf") for ds in AOEcat.datasets if '.cdf' in ds])
-# # Find the index of the date we want
-# #ind = np.argmin(np.abs(dt - AOEnc_dates))
-# # Get the dataset
-# #AOEds = AOEcat.datasets[ind]
-
-
-# stares=[]
-# vads=[]
-# rets=[]
-# for i in range(len(STRcat.datasets)):
-#     stares.append(str(STRcat.datasets[i]))
-# for i in range(len(VADcat.datasets)):
-#     vads.append(str(VADcat.datasets[i]))
-# for i in range(len(AOEcat.datasets)):
-#     rets.append(str(AOEcat.datasets[i]))
-   
-## Build the range of dates you need to loop over    
-# dates=np.concatenate((np.arange(20190920,20190931,1),np.arange(20191000,20191002,1)))
-## Option: replace the full range with a subset for debugging or for a case specific test
-# #dates=dates[8:9] 
-
-## look for dates where Stare, VAD, and Retrieval file are all present
-# dates_flags = np.full(dates.shape, np.nan)
-# for i in range(len(dates)):
-#     if np.all([any(str(dates[i]) in string for string in stares), 
-#                any(str(dates[i]) in string for string in vads), 
-#                any(str(dates[i]) in string for string in rets)]):
-#         dates_flags[i] = True
-#     else: 
-#         dates_flags[i] = False
-        
-# #repeat to toss bad files (non .cdf)
-# stares=[]
-# vads=[]
-# rets=[]
-# indexing_original_cats = []
-# count = 0
-# for i in range(len(STRcat.datasets)):
-#     if str(STRcat.datasets[i])[-3:]=='cdf': #ignore png/pdf files in directory
-#         stares.append(str(STRcat.datasets[i]))
-#         count=count+1
-#         if count<2:
-#             indexing_original_cats.append(i)
-# count = 0
-# for i in range(len(VADcat.datasets)):
-#     if str(VADcat.datasets[i])[-3:]=='cdf':
-#         vads.append(str(VADcat.datasets[i]))
-#         count=count+1
-#         if count<2:
-#             indexing_original_cats.append(i)
-# count = 0
-# for i in range(len(AOEcat.datasets)):
-#     if str(AOEcat.datasets[i])[-3:]=='cdf':
-#         rets.append(str(AOEcat.datasets[i]))
-#         count=count+1
-#         if count<2:
-#             indexing_original_cats.append(i)
-
-## only operate on cases where Stare, VAD, and Retrieval file are all present
-# for case in range(0,len(dates)):#if the loop stops for whatever reason and you want to start 
-#                                 #where you left off, change 0 to whatever number
-#     Case=dates[case]
-#     if dates_flags[case]==0:
-#         print('Missing obs on '+str(Case))
-#         continue
-#     print('PROCESSING'+str(Case))
-#     #search for correct index for each set of files
-#     idx_s = [i for i, s in enumerate(stares) if str(Case) in s][0]
-#     idx_v = [i for i, s in enumerate(vads) if str(Case) in s][0]
-#     idx_a = [i for i, s in enumerate(rets) if str(Case) in s][0]
-    
-#     # grab proper info for day where Stare, VAD, and Retrieval file are all present
-#     STRds = STRcat.datasets[idx_s + indexing_original_cats[0]]
-#     VADds = VADcat.datasets[idx_v + indexing_original_cats[1]]
-#     AOEds = AOEcat.datasets[idx_a + indexing_original_cats[2]]
-#     # Modify catURL to get the dataset URLs
-#     STRdsURL = STRcatURL.replace('catalog.xml', STRds.name).replace('catalog', 'dodsC')
-#     VADdsURL = VADcatURL.replace('catalog.xml', VADds.name).replace('catalog', 'dodsC')
-#     AOEdsURL = AOEcatURL.replace('catalog.xml', AOEds.name).replace('catalog', 'dodsC')
-
-    #end thredds CHEESHEAD
-    ##################################################################################################################
-    
-    
-##################################################################################################################    
-#siphon THREDDS for PBLTOPS
-##################################################################################################################
-
-#Catalog for the CLAMPS2 stares
-STRcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/kaefs/stare/catalog.xml"
-#Open the catalog
+# Catalog for the CLAMPS2 stares
+#STRcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/CHEESEHEAD/CLAMPS1/dlfp/catalog.xml"
+STRcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/NWCRIL2020/clamps1/stare/catalog.xml"
+# Open the catalog
 STRcat = TDSCatalog(STRcatURL)
 # Print some of the datasets
 #print(STRcat.datasets[:])
@@ -803,7 +688,8 @@ STRcat = TDSCatalog(STRcatURL)
 
 
 # Catalog for the CLAMPS2 VADs
-VADcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/kaefs/vad/catalog.xml"
+#VADcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/CHEESEHEAD/CLAMPS1/dlvad/catalog.xml"
+VADcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/NWCRIL2020/clamps1/vad/catalog.xml"
 # Open the catalog
 VADcat = TDSCatalog(VADcatURL)
 # Print some of the datasets
@@ -817,8 +703,8 @@ VADcat = TDSCatalog(VADcatURL)
 
 
 # Catalog for the CLAMPS2 AERIoe
-#AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps2/oun/tropoe_v1/catalog.xml"
-AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/kaefs/tropoe_v1/catalog.xml"
+#AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/CHEESEHEAD/CLAMPS1/aerionly/V2/catalog.xml"
+AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/NWCRIL2020/clamps1/tropoe/catalog.xml"
 # Open the catalog
 AOEcat = TDSCatalog(AOEcatURL)
 # Print some of the datasets
@@ -830,6 +716,7 @@ AOEcat = TDSCatalog(AOEcatURL)
 # Get the dataset
 #AOEds = AOEcat.datasets[ind]
 
+
 stares=[]
 vads=[]
 rets=[]
@@ -839,44 +726,171 @@ for i in range(len(VADcat.datasets)):
     vads.append(str(VADcat.datasets[i]))
 for i in range(len(AOEcat.datasets)):
     rets.append(str(AOEcat.datasets[i]))
-
+   
 # Build the range of dates you need to loop over    
-dates=np.concatenate((np.arange(20200821,20200832,1),np.arange(20200900,20200931,1)))
+dates = np.arange(20200625,20200626,1)
+#dates=np.concatenate((np.arange(20200604,20200631,1),np.arange(20200700,20200732,1),np.arange(20200800,20200811,1)))
+#dates=np.concatenate((np.arange(20190925,20190931,1),np.arange(20191000,20191002,1)))
+#dates=np.concatenate((np.arange(20190923,20190931,1),np.arange(20191000,20191002,1)))
 # Option: replace the full range with a subset for debugging or for a case specific test
-#dates=dates[27:28] 
+#dates=dates[8:9] 
 
 # look for dates where Stare, VAD, and Retrieval file are all present
 dates_flags = np.full(dates.shape, np.nan)
 for i in range(len(dates)):
     if np.all([any(str(dates[i]) in string for string in stares), 
-              any(str(dates[i]) in string for string in vads), 
-              any(str(dates[i]) in string for string in rets)]):
+                any(str(dates[i]) in string for string in vads), 
+                any(str(dates[i]) in string for string in rets)]):
         dates_flags[i] = True
     else: 
         dates_flags[i] = False
+        
+#repeat to toss bad files (non .cdf)
+stares=[]
+vads=[]
+rets=[]
+indexing_original_cats = []
+count = 0
+for i in range(len(STRcat.datasets)):
+    if str(STRcat.datasets[i])[-3:]=='cdf': #ignore png/pdf files in directory
+        stares.append(str(STRcat.datasets[i]))
+        count=count+1
+        if count<2:
+            indexing_original_cats.append(i)
+count = 0
+for i in range(len(VADcat.datasets)):
+    if str(VADcat.datasets[i])[-3:]=='cdf':
+        vads.append(str(VADcat.datasets[i]))
+        count=count+1
+        if count<2:
+            indexing_original_cats.append(i)
+count = 0
+for i in range(len(AOEcat.datasets)):
+    if str(AOEcat.datasets[i])[-3:]=='cdf':
+        rets.append(str(AOEcat.datasets[i]))
+        count=count+1
+        if count<2:
+            indexing_original_cats.append(i)
 
 # only operate on cases where Stare, VAD, and Retrieval file are all present
 for case in range(0,len(dates)):#if the loop stops for whatever reason and you want to start 
                                 #where you left off, change 0 to whatever number
     Case=dates[case]
     if dates_flags[case]==0:
-        print('Missing obs on '+ str(Case))
+        print('Missing obs on '+str(Case))
         continue
     print('PROCESSING'+str(Case))
     #search for correct index for each set of files
     idx_s = [i for i, s in enumerate(stares) if str(Case) in s][0]
     idx_v = [i for i, s in enumerate(vads) if str(Case) in s][0]
     idx_a = [i for i, s in enumerate(rets) if str(Case) in s][0]
-
+    
     # grab proper info for day where Stare, VAD, and Retrieval file are all present
-    STRds = STRcat.datasets[idx_s]
-    VADds = VADcat.datasets[idx_v]
-    AOEds = AOEcat.datasets[idx_a]
+    STRds = STRcat.datasets[idx_s + indexing_original_cats[0]]
+    VADds = VADcat.datasets[idx_v + indexing_original_cats[1]]
+    AOEds = AOEcat.datasets[idx_a + indexing_original_cats[2]]
     # Modify catURL to get the dataset URLs
     STRdsURL = STRcatURL.replace('catalog.xml', STRds.name).replace('catalog', 'dodsC')
     VADdsURL = VADcatURL.replace('catalog.xml', VADds.name).replace('catalog', 'dodsC')
     AOEdsURL = AOEcatURL.replace('catalog.xml', AOEds.name).replace('catalog', 'dodsC')
-    #end thredds PBLtops
+
+    #end thredds CHEESHEAD
+    ##################################################################################################################
+    
+    
+##################################################################################################################    
+#siphon THREDDS for PBLTOPS
+##################################################################################################################
+
+# #Catalog for the CLAMPS2 stares
+# STRcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/shv/stare/catalog.xml"
+# #Open the catalog
+# STRcat = TDSCatalog(STRcatURL)
+# # Print some of the datasets
+# #print(STRcat.datasets[:])
+# # Get the dates for all the netCDF datasets
+# #STRnc_dates = np.array([datetime.strptime(ds, "clampsdlfpC1.b1.%Y%m%d.%H%M%S.cdf") for ds in STRcat.datasets if '.cdf' in ds])
+# # Find the index of the date we want
+# #ind = np.argmin(np.abs(dt - STRnc_dates))
+# # Get the dataset
+# #STRds = STRcat.datasets[ind]
+
+
+# # Catalog for the CLAMPS2 VADs
+# VADcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/shv/vad/catalog.xml"
+# # Open the catalog
+# VADcat = TDSCatalog(VADcatURL)
+# # Print some of the datasets
+# #print(VADcat.datasets[:])
+# # Get the dates for all the netCDF datasets
+# #VADnc_dates = np.array([datetime.strptime(".".join(ds.split['.'][-3:-1]), "%Y%m%d.%H%M%S") for ds in VADcat.datasets if '.cdf' in ds])
+# # Find the index of the date we want
+# #ind = np.argmin(np.abs(dt - VADnc_dates))
+# # Get the dataset
+# #VADds = VADcat.datasets[ind]
+
+
+# # Catalog for the CLAMPS2 AERIoe
+# #AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps2/oun/tropoe_v1/catalog.xml"
+# AOEcatURL = "https://data.nssl.noaa.gov/thredds/catalog/FRDD/CLAMPS/campaigns/PBLtops/clamps1/shv/tropoe_v2/aerimwr/catalog.xml"
+# # Open the catalog
+# AOEcat = TDSCatalog(AOEcatURL)
+# # Print some of the datasets
+# #print(AOEcat.datasets[:])
+# # Get the dates for all the netCDF datasets
+# #AOEnc_dates = np.array([datetime.strptime(ds, "clampsaerieoe1turnC1.c1.%Y%m%d.%H%M%S.cdf") for ds in AOEcat.datasets if '.cdf' in ds])
+# # Find the index of the date we want
+# #ind = np.argmin(np.abs(dt - AOEnc_dates))
+# # Get the dataset
+# #AOEds = AOEcat.datasets[ind]
+
+# stares=[]
+# vads=[]
+# rets=[]
+# for i in range(len(STRcat.datasets)):
+#     stares.append(str(STRcat.datasets[i]))
+# for i in range(len(VADcat.datasets)):
+#     vads.append(str(VADcat.datasets[i]))
+# for i in range(len(AOEcat.datasets)):
+#     rets.append(str(AOEcat.datasets[i]))
+
+# # Build the range of dates you need to loop over    
+# dates=np.concatenate((np.arange(20200821,20200832,1),np.arange(20200900,20200931,1)))
+# # Option: replace the full range with a subset for debugging or for a case specific test
+# #dates=dates[27:28] 
+
+# # look for dates where Stare, VAD, and Retrieval file are all present
+# dates_flags = np.full(dates.shape, np.nan)
+# for i in range(len(dates)):
+#     if np.all([any(str(dates[i]) in string for string in stares), 
+#               any(str(dates[i]) in string for string in vads), 
+#               any(str(dates[i]) in string for string in rets)]):
+#         dates_flags[i] = True
+#     else: 
+#         dates_flags[i] = False
+
+# # only operate on cases where Stare, VAD, and Retrieval file are all present
+# for case in range(0,len(dates)):#if the loop stops for whatever reason and you want to start 
+#                                 #where you left off, change 0 to whatever number
+#     Case=dates[case]
+#     if dates_flags[case]==0:
+#         print('Missing obs on '+ str(Case))
+#         continue
+#     print('PROCESSING'+str(Case))
+#     #search for correct index for each set of files
+#     idx_s = [i for i, s in enumerate(stares) if str(Case) in s][0]
+#     idx_v = [i for i, s in enumerate(vads) if str(Case) in s][0]
+#     idx_a = [i for i, s in enumerate(rets) if str(Case) in s][0]
+
+#     # grab proper info for day where Stare, VAD, and Retrieval file are all present
+#     STRds = STRcat.datasets[idx_s]
+#     VADds = VADcat.datasets[idx_v]
+#     AOEds = AOEcat.datasets[idx_a]
+#     # Modify catURL to get the dataset URLs
+#     STRdsURL = STRcatURL.replace('catalog.xml', STRds.name).replace('catalog', 'dodsC')
+#     VADdsURL = VADcatURL.replace('catalog.xml', VADds.name).replace('catalog', 'dodsC')
+#     AOEdsURL = AOEcatURL.replace('catalog.xml', AOEds.name).replace('catalog', 'dodsC')
+#     #end thredds PBLtops
     #################################################################################################################
     
         
@@ -949,8 +963,8 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     # These are generalized to work regardless of the data access method used above (local vs THREDDS)
     
     plot_me = True # set to true to get plots
-    show_me = False # set to true to show plots. Set to false to save plots
-    write_me = True # set to true to write out final PBL height info to netcdf
+    show_me = True # set to true to show plots. Set to false to save plots
+    write_me = False # set to true to write out final PBL height info to netcdf
     
     C1_cheese_lat = 45.92
     C1_cheese_lon = -89.73
@@ -962,20 +976,26 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     C1_pblkshv_lon = -93.8414
     C2_pblkoun_lat = 35.2368
     C2_pblkoun_lon = -97.4637
+    NWC_lat = 35.18
+    NWC_lon = -97.44
     
     author_list = 'Elizabeth Smith (NOAA-NSSL); Jacob Carlin (OU-CIMMS/NSSL)'
     contact_list = 'elizabeth.smith@noaa.gov; jacob.carlin@noaa.gov'
-    campaign = 'PBLTops2020'
+    campaign = 'NWCRIL2020'
     
-    sun_lat = C2_pblkoun_lat
-    sun_lon = C2_pblkoun_lon
+    sun_lat = NWC_lat
+    sun_lon = NWC_lon
     
     
     #files
-    path_to_write = '/Users/jacob.carlin/Documents/Data/PBL Tops/test/'
-    path_to_plots = '/Users/jacob.carlin/Documents/Data/PBL Tops/test/'
-    # path_to_write = '/Users/elizabeth.smith/Documents/CHEESEHEAD/PBLTopFuzzy/output_files/'
-    # path_to_plots = '/Users/elizabeth.smith/Documents/CHEESEHEAD/PBLTopFuzzy/'
+   # path_to_write = '/Users/jacob.carlin/Documents/Data/PBL Tops/test/'
+   # path_to_plots = '/Users/jacob.carlin/Documents/Data/PBL Tops/test/'
+    # path_to_write = '/Users/elizabeth.smith/Documents/PBLTops/output_files/V3/'
+    # path_to_plots = '/Users/elizabeth.smith/Documents/PBLTops/plots/V3/'
+    #path_to_write = '/Users/elizabeth.smith/Documents/CHEESEHEAD/PBLTopFuzzy/CLAMPS1_Lakeland/output_files/V3/C1MWRonly/'
+    #path_to_plots = '/Users/elizabeth.smith/Documents/CHEESEHEAD/PBLTopFuzzy/CLAMPS1_Lakeland/quicklook_images/V3/C1MWRonly/'
+    path_to_write = '/Users/elizabeth.smith/Documents/PBLTops/NWCRILout/files/'
+    path_to_plots = '/Users/elizabeth.smith/Documents/PBLTops/NWCRILout/plots/'
     
     #stares
     date_files = STRdsURL
@@ -986,7 +1006,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     date_filev = VADdsURL
     #date_filev = path_to_files+'clampsdlvad1turnC1.c1.20200920.000859.cdf'
     #date_filev = path_to_files+'clampsdlvadC2.c1.20200915.000000.cdf'
-    
+    #%%
     #aeri retrievals 
     date_filea = AOEdsURL
     #data_filea = path_to_files+'clampsaerioe1turnC1.c1.20200920.001005.cdf'
@@ -1272,6 +1292,32 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
             inv_fuzz[i,inversion_idx+1:] = 0 # outside the boundary layer
         inv_fuzz_wt[i, :] = f(x[i]) # apply weighting as defined above
         inversion.append(y[inversion_idx])
+    
+    plt.figure(figsize=(18,6))
+    plt.plot((membership_times-base_time)/3600.,membership_value_vec, lw=6, color='k',label='Inversion Weight')
+    plt.axvline((real_sunup-base_time)/3600.,ls='--',color='grey')
+    plt.axvline((real_sundown-base_time)/3600.,ls='--',color='grey')
+    #plt.legend()
+    plt.title(str(platform)+' '+str(date_label))#+' Inversion Weight as a Function of Sunrise/Sunset')
+    plt.xticks(np.arange(0,24.1,3),x_tick_labels)
+    plt.xlim(0,24.1)
+    plt.xlabel('Hour [UTC]')
+    plt.ylim(0,2.1)
+    plt.ylabel('Height AGL [km]')
+    plt.show()
+    
+    plt.figure(figsize=(18,6))
+    plt.plot(x/60.,inversion, lw=6, color='k',label='Inversion Height')
+    plt.axvline((real_sunup-base_time)/3600.,ls='--',color='grey')
+    plt.axvline((real_sundown-base_time)/3600.,ls='--',color='grey')
+    #plt.legend()
+    plt.title(str(platform)+' '+str(date_label))#+' Inversion Weight as a Function of Sunrise/Sunset')
+    plt.xticks(np.arange(0,24.1,3),x_tick_labels)
+    plt.xlim(0,24.1)
+    plt.xlabel('Hour [UTC]')
+    plt.ylim(0,2.1)
+    plt.ylabel('Height AGL [km]')
+    plt.show()
       
     # Compute overall aggregate values
     sum_fuzz = np.zeros_like(wVar_fuzz_intp_wt)
@@ -1335,13 +1381,14 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         #########################################################
         plt.figure(figsize=(18,6))
         plt.pcolormesh(x,y,sum_fuzz.transpose(),vmin=0,vmax=1,cmap='inferno')
-        plt.plot(x,BLhgt,'bo',zorder=1000,alpha=.5)
-        plt.plot(x,BLhgt_sm,'b')
-        plt.colorbar(label='Aggregrate First Gen')
+        plt.plot(x,BLhgt,marker='o',ls='none', color='lightpink',markeredgecolor='purple',zorder=1000,alpha=.5)
+        plt.plot(x,BLhgt_sm,color='purple',lw=5)
+        plt.plot(x,BLhgt_sm,color='lightpink',lw=3)
+        plt.colorbar(label='Aggregrate 1st Gen')
         plt.ylim(0.06,2.75)
         #plt.ylim(0,2)
-        plt.xticks(np.arange(0,1410.1,180),x_tick_labels)
-        plt.xlim(0.0,1410)
+        plt.xticks(np.arange(0,1440.1,180),x_tick_labels)
+        plt.xlim(0.0,1440.1)
         plt.title(str(platform)+' '+str(date_label))
         plt.xlabel('Hour [UTC]')
         plt.ylabel(' Height AGL [km]')
@@ -1506,11 +1553,15 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     
     sunup_min = (sunup - base_time)/60.
     sundown_min = (sundown - base_time)/60.
-    
+    #%%
     if x[-1] > sunup_min: # if there are enough data to care about cutting the overnight terms off
         cut_start = np.where(x > sunup_min)[0][0] 
         if sundown_min < 1410.: # 23:30 Z
-            cut_end = np.where(x > sundown_min)[0][0]+1
+            search_term = np.where(x > sundown_min)
+            if len(search_term[0])<1: #the file ends before sunset and before 2359
+                cut_end = len(x)
+            else:
+                cut_end = np.where(x > sundown_min)[0][0]+1
         else: #if sundown is inbetween 23:30 and 00Z
             cut_end = len(x)-1
         if cut_end < cut_start: #sunset is after 0
@@ -1537,21 +1588,23 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     
       
     
-    #%%
+ #%%   
     if plot_me == True:
         #########################################################
         # Plot second generation aggregrate
         #########################################################
         plt.figure(figsize=(18,6))
         plt.pcolormesh(x,y,sum_fuzz_2.transpose(),vmin=0,vmax=1,cmap='inferno')
-        plt.plot(x,BLhgt_2,'go',zorder=1000,alpha=.5)
-        plt.plot(x,BLhgt_2_sm,'g',label='2nd gen')
-        plt.plot(x,BLhgt,'bo',zorder=1000,alpha=.5)
-        plt.plot(x,BLhgt_sm,'b',label='1st gen')
-        plt.colorbar(label='Aggregrate Sec. Gen')
+        plt.plot(x,BLhgt_2,marker='o',ls='none',color='skyblue',markeredgecolor='navy',zorder=1000,alpha=.5)
+        plt.plot(x,BLhgt_2_sm,color='navy',lw=5)
+        plt.plot(x,BLhgt_2_sm,color='skyblue',lw=3,label='2nd gen')
+        plt.plot(x,BLhgt,marker='o',ls='none', color='lightpink',markeredgecolor='purple',zorder=1000,alpha=.5)
+        plt.plot(x,BLhgt_sm,color='purple',lw=5)
+        plt.plot(x,BLhgt_sm,color='lightpink',lw=3,label='1st gen')
+        plt.colorbar(label='Aggregrate 2nd Gen')
         plt.ylim(0.06,2.75)
-        plt.xticks(np.arange(0,1410.1,180),x_tick_labels)
-        plt.xlim(0.0,1410)
+        plt.xticks(np.arange(0,1440.1,180),x_tick_labels)
+        plt.xlim(0.0,1440.1)
         plt.xlabel('Hour [UTC]')
         plt.ylabel(' Height AGL [km]')
         plt.title(str(platform)+' '+str(date_label))
@@ -1564,7 +1617,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
     
     print('Second Gen. Fuzzy Complete')    
     
-    
+#%%    
     
     ##################################################################################################################
     # Basic variable visualizations 
@@ -1581,11 +1634,53 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         plt.figure(figsize=(18,6))
         plt.pcolormesh(HR,Z,snr.transpose(),vmin=.99,vmax=1.1,cmap='inferno')
         plt.colorbar(label='Intensity [SNR+1]')
-        plt.fill_between(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
-        plt.plot(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
-        plt.plot(x/60.,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
-        plt.plot(x/60.,BLhgt_2_sm,color='w',lw=3)
-        plt.plot(x/60.,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        # plt.fill_between(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x/60.,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        plt.ylim(0.06,2.75)
+        plt.xticks(np.arange(0,24.1,3))
+        plt.xlim(0.0,24)
+        plt.xlabel('Hour [UTC]')
+        plt.ylabel(' Height AGL [km]')
+        plt.title(str(platform)+' '+str(date_label))
+        if show_me == True:
+            plt.show()
+        else:
+            plt.savefig(path_to_plots+date_label+'_SNR_'+platform+'.png')
+            plt.close()
+            
+        #w
+        plt.figure(figsize=(18,6))
+        plt.pcolormesh(HR,Z,w.transpose(),vmin=-2.5,vmax=2.5,cmap='cmo.balance')
+        plt.colorbar(label='Intensity [SNR+1]')
+        # plt.fill_between(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x/60.,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        plt.ylim(0.06,2.75)
+        plt.xticks(np.arange(0,24.1,3))
+        plt.xlim(0.0,24)
+        plt.xlabel('Hour [UTC]')
+        plt.ylabel(' Height AGL [km]')
+        plt.title(str(platform)+' '+str(date_label))
+        if show_me == True:
+            plt.show()
+        else:
+            plt.savefig(path_to_plots+date_label+'_w_'+platform+'.png')
+            plt.close()
+            
+        #sigsnr
+        plt.figure(figsize=(18,6))
+        plt.pcolormesh(sigsnr_t,Z,sigsnr.transpose(),vmin=0,vmax=.0001,cmap='inferno')
+        plt.colorbar(label='Intensity [SNR+1] Variance')
+        # plt.fill_between(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x/60.,BLhgt_2_sm,color='k',lw=2,label='PBLH')
         plt.ylim(0.06,2.75)
         plt.xticks(np.arange(0,24.1,3))
         plt.xlim(0.0,24)
@@ -1604,58 +1699,172 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         plt.pcolormesh(sigw_t,Z,sigw.transpose(),vmin=0,vmax=.6,cmap='summer')
         plt.colorbar(label='Vertical Velocity Variance [m/s]')
         plt.ylim(0.06,2.75)
-        plt.xticks(np.arange(0,1410.1,180),x_tick_labels)
-        plt.xlim(0.0,1410)
+        plt.xticks(np.arange(0,1440.1,180),x_tick_labels)
+        plt.xlim(0.0,1440.1)
         plt.xlabel('Hour [UTC]')
         plt.ylabel(' Height AGL [km]')
         plt.title(str(platform)+' '+str(date_label))
-        plt.fill_between(x,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
-        plt.plot(x,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
-        plt.plot(x,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
-        plt.plot(x,BLhgt_2_sm,color='w',lw=3)
-        plt.plot(x,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        # plt.fill_between(x,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x,BLhgt_2_sm,color='k',lw=2,label='PBLH')
         plt.legend()
         if show_me == True:
             plt.show()
         else:
             plt.savefig(path_to_plots+date_label+'_sigw_'+platform+'.png')
             plt.close()
-        
-        
-        
-        # #T grad
+            
+         #sigw_night
         plt.figure(figsize=(18,6))
-        plt.pcolormesh(HRa,Za,T_grad.transpose(),vmin=-1,vmax=1,cmap=cm.cm.delta)
-        plt.colorbar(label='Temperature gradient [C]')
+        plt.pcolormesh(sigw_t,Z,sigw.transpose(),vmin=0,vmax=.05,cmap='summer')
+        plt.colorbar(label='Vertical Velocity Variance [m/s]')
+        plt.ylim(0.06,2.75)
+        plt.xticks(np.arange(0,720.1,180),x_tick_labels[:5])
+        plt.xlim(0.0,720)
+        plt.xlabel('Hour [UTC]')
+        plt.ylabel(' Height AGL [km]')
+        plt.title(str(platform)+' '+str(date_label))
+        # plt.fill_between(x,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        plt.legend()
+        if show_me == True:
+            plt.show()
+        else:
+            plt.savefig(path_to_plots+date_label+'_sigw_night_'+platform+'.png')
+            plt.close()
+            
+        #sigw_HF
+        plt.figure(figsize=(18,6))
+        plt.pcolormesh(HFt,Z,HFwVar.transpose(),vmin=0,vmax=.6,cmap='summer')
+        plt.colorbar(label='Hi-Freq. Vertical Velocity Variance [m/s]')
         plt.ylim(0.06,2.75)
         plt.xticks(np.arange(0,24.1,3))
         plt.xlim(0.0,24)
         plt.xlabel('Hour [UTC]')
         plt.ylabel(' Height AGL [km]')
+        plt.title(str(platform)+' '+str(date_label))
+        # plt.fill_between(x,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        plt.legend()
+        if show_me == True:
+            plt.show()
+        else:
+            plt.savefig(path_to_plots+date_label+'_HFsigw_'+platform+'.png')
+            plt.close()
+            
+        #u
+        plt.figure(figsize=(18,6))
+        plt.pcolormesh(HRv,Zv,u.transpose(),vmin=-5,vmax=15,cmap='cmo.matter')
+        plt.colorbar(label='u-component velocity [m/s]')
+        plt.ylim(0.06,2.75)
+        plt.xticks(np.arange(0,24.1,3))
+        plt.xlim(0.0,24)
+        plt.xlabel('Hour [UTC]')
+        plt.ylabel(' Height AGL [km]')
+        plt.title(str(platform)+' '+str(date_label))
+        # plt.fill_between(x,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        plt.legend()
+        if show_me == True:
+            plt.show()
+        else:
+            plt.savefig(path_to_plots+date_label+'_u_'+platform+'.png')
+            plt.close()
+            
+        #v
+        plt.figure(figsize=(18,6))
+        plt.pcolormesh(HRv,Zv,v.transpose(),vmin=-5,vmax=15,cmap='cmo.matter')
+        plt.colorbar(label='v-component velocity [m/s]')
+        plt.ylim(0.06,2.75)
+        plt.xticks(np.arange(0,24.1,3))
+        plt.xlim(0.0,24)
+        plt.xlabel('Hour [UTC]')
+        plt.ylabel(' Height AGL [km]')
+        plt.title(str(platform)+' '+str(date_label))
+        # plt.fill_between(x,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        plt.legend()
+        if show_me == True:
+            plt.show()
+        else:
+            plt.savefig(path_to_plots+date_label+'_v_'+platform+'.png')
+            plt.close()
+        
+        
+        
+        # # #T grad
+        # plt.figure(figsize=(18,6))
+        # plt.pcolormesh(HRa,Za,T_grad.transpose(),vmin=-1,vmax=1,cmap=cm.cm.delta)
+        # plt.colorbar(label='Temperature gradient [C]')
+        # plt.ylim(0.06,2.75)
+        # plt.xticks(np.arange(0,24.1,3))
+        # plt.xlim(0.0,24)
+        # plt.xlabel('Hour [UTC]')
+        # plt.ylabel(' Height AGL [km]')
+        # # plt.plot(x/60.,BLhgt_sm,'w',lw=3)
+        # # plt.plot(x/60.,BLhgt_sm,'k',lw=2,label='1st gen')
+        # # plt.plot(x/60.,BLhgt_2_sm,'w',lw=3)
+        # # plt.plot(x/60.,BLhgt_2_sm,'b',lw=2,label='2nd gen')
+        # plt.fill_between(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x/60.,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        # plt.legend()
+        # plt.title(str(platform)+' '+str(date_label))
+        # if show_me == True:
+        #     plt.show()
+        # else:
+        #     plt.savefig(path_to_plots+date_label+'_Tgrad_'+platform+'.png')
+        #     plt.close()
+        
+        #T
+        plt.figure(figsize=(18,6))
+        plt.pcolormesh(HRa,Za,T.transpose(),vmin=10,vmax=30,cmap='plasma')
+        plt.colorbar(label='Temperature [C]')
+        plt.ylim(0.06,2.75)
+        plt.xticks(np.arange(0,24.1,3))
+        plt.xlim(0.0,24.1)
+        plt.xlabel('Hour [UTC]')
+        plt.ylabel(' Height AGL [km]')
+        plt.title(str(platform)+' '+str(date_label))
         # plt.plot(x/60.,BLhgt_sm,'w',lw=3)
         # plt.plot(x/60.,BLhgt_sm,'k',lw=2,label='1st gen')
         # plt.plot(x/60.,BLhgt_2_sm,'w',lw=3)
         # plt.plot(x/60.,BLhgt_2_sm,'b',lw=2,label='2nd gen')
-        plt.fill_between(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
-        plt.plot(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
-        plt.plot(x/60.,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
-        plt.plot(x/60.,BLhgt_2_sm,color='w',lw=3)
-        plt.plot(x/60.,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        # plt.fill_between(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x/60.,BLhgt_2_sm,color='k',lw=2,label='PBLH')
         plt.legend()
-        plt.title(str(platform)+' '+str(date_label))
         if show_me == True:
             plt.show()
         else:
-            plt.savefig(path_to_plots+date_label+'_Tgrad_'+platform+'.png')
+            plt.savefig(path_to_plots+date_label+'_T_'+platform+'.png')
             plt.close()
         
         # #WV
         plt.figure(figsize=(18,6))
-        plt.pcolormesh(HRa,Za,wv.transpose(),vmin=0,vmax=18,cmap='viridis')
-        plt.colorbar(label='WV Mixing Ratio')
+        plt.pcolormesh(HRa,Za,wv.transpose(),vmin=0,vmax=18,cmap='cmo.deep')
+        plt.colorbar(label='WV Mixing Ratio [g/kg]')
         plt.ylim(0.06,2.75)
         plt.xticks(np.arange(0,24.1,3))
-        plt.xlim(0.0,24)
+        plt.xlim(0.0,24.1)
         plt.xlabel('Hour [UTC]')
         plt.ylabel(' Height AGL [km]')
         plt.title(str(platform)+' '+str(date_label))
@@ -1663,18 +1872,18 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         # plt.plot(x/60.,BLhgt_sm,'k',lw=2,label='1st gen')
         # plt.plot(x/60.,BLhgt_2_sm,'w',lw=3)
         # plt.plot(x/60.,BLhgt_2_sm,'b',lw=2,label='2nd gen')
-        plt.fill_between(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
-        plt.plot(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
-        plt.plot(x/60.,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
-        plt.plot(x/60.,BLhgt_2_sm,color='w',lw=3)
-        plt.plot(x/60.,BLhgt_2_sm,color='k',lw=2,label='PBLH')
+        # plt.fill_between(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',alpha=.3)
+        # plt.plot(x/60.,BLhgt_2_sm-BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm+BLhgt_2_sm_range,color='grey',lw=2)
+        # plt.plot(x/60.,BLhgt_2_sm,color='w',lw=3)
+        # plt.plot(x/60.,BLhgt_2_sm,color='k',lw=2,label='PBLH')
         plt.legend()
         if show_me == True:
             plt.show()
         else:
             plt.savefig(path_to_plots+date_label+'_WV_'+platform+'.png')
             plt.close()
-        
+  #%%      
         #summary figure
         fig,ax=plt.subplots(1,1,sharey=True,sharex=True,figsize=(18,6))
         ax.plot(x/60.,BLhgt_sm, lw=6, color='k',label='1st Gen')
@@ -1682,6 +1891,10 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         ax.plot(x/60.,BLhgt_om2_sm, 'co',lw=None, label='2nd Gen Mech')
         ax.plot(x/60.,BLhgt_ob2_sm, 'mo', lw=None, label='2nd Gen Buoy')
         plt.legend()
+        plt.title(str(platform)+' '+str(date_label))
+        plt.xlabel('Hour [UTC]')
+        plt.ylabel(' Height AGL [km]')
+        plt.xticks(np.arange(0,24.1,3))
         plt.xlim(0,24)
         plt.ylim(0.06,2.75)
         if show_me == True:
@@ -1689,7 +1902,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         else:
             plt.savefig(path_to_plots+date_label+'_summary_'+platform+'.png')
             plt.close()
-    
+#%%    
     ##################################################################################################################
     # Netcdf writeout
     ##################################################################################################################
@@ -1758,7 +1971,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         setattr(output_file.variables['pblh_mech'],'units','km a.g.l.')
         setattr(output_file.variables['pblh_mech'],'description','PBL height including only "mechanical" terms" from lidar')
         
-        output_file.createVariable('pblh_therm','f4',('t'))[:] = ten_pblh_om
+        output_file.createVariable('pblh_therm','f4',('t'))[:] = ten_pblh_ob
         setattr(output_file.variables['pblh_therm'],'units','km a.g.l.')
         setattr(output_file.variables['pblh_therm'],'description','PBL height including only "thermal" terms" from thermo retrievals')
         
@@ -1785,7 +1998,7 @@ for case in range(0,len(dates)):#if the loop stops for whatever reason and you w
         setattr(output_file.variables['pblh_1hr_mech'],'units','km a.g.l.')
         setattr(output_file.variables['pblh_1hr_mech'],'description','PBL height including only "mechanical" terms" from lidar')
         
-        output_file.createVariable('pblh_1hr_therm','f4',('t_1hr'))[:] = hourly_pblh_om
+        output_file.createVariable('pblh_1hr_therm','f4',('t_1hr'))[:] = hourly_pblh_ob
         setattr(output_file.variables['pblh_1hr_therm'],'units','km a.g.l.')
         setattr(output_file.variables['pblh_1hr_therm'],'description','PBL height including only "thermal" terms" from thermo retrievals')
         
