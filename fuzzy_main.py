@@ -25,7 +25,8 @@ import pandas as pd
 from siphon.catalog import TDSCatalog
 from datetime import datetime, timezone, timedelta
 from suntime import Sun
-import cmocean as cm
+# import cmocean as cm #can use for additional colorbars, 
+# opted to remove for simplicty 
 
 #this is making the plots pretty!
 plt.style.use('bmh')
@@ -739,7 +740,7 @@ for i in range(len(AOEcat.datasets)):
 dates=np.concatenate((np.arange(20200604,20200631,1),np.arange(20200700,20200732,1),np.arange(20200800,20200811,1)))
 
 # Option: replace the full range with a subset for debugging or for a case specific test
-#dates=dates[8:9] 
+dates=dates[8:9] 
 
 # look for dates where Stare, VAD, and Retrieval file are all present
 dates_flags = np.full(dates.shape, np.nan)
@@ -872,21 +873,13 @@ for case in range(0,len(dates)):# if the loop stops for whatever reason and you 
     # Here we set file paths, location parameters, writeout attributes, etc.
     # These are generalized to work regardless of the data access method used above (local vs THREDDS)
     
+    #OPTIONS 
     plot_me = True # set to true to get plots
-    show_me = True # set to true to show plots. Set to false to save plots
-    write_me = False # set to true to write out final PBL height info to netcdf
+    write_me = True # set to true to write out final PBL height info to netcdf
+    show_me = False # set to true to show plots. Set to false to save plots
+    inv_check = False # set to true to get additional plots of inversion weighting f(x) and height
     
     #lat/lon points for easy use (can also be wise and grab these from data files...)
-    C1_cheese_lat = 45.92
-    C1_cheese_lon = -89.73
-    C2_cheese_lat = 45.54
-    C2_cheese_lon = -90.28
-    C1_pblkaefs_lat = 34.9824
-    C1_pblkaefs_lon = -97.5206
-    C1_pblkshv_lat = 32.4511
-    C1_pblkshv_lon = -93.8414
-    C2_pblkoun_lat = 35.2368
-    C2_pblkoun_lon = -97.4637
     NWC_lat = 35.18
     NWC_lon = -97.44
     
@@ -900,8 +893,8 @@ for case in range(0,len(dates)):# if the loop stops for whatever reason and you 
     
     
     #files
-    path_to_write = '/Users/elizabeth.smith/Documents/PBLTops/NWCRILout/files/'
-    path_to_plots = '/Users/elizabeth.smith/Documents/PBLTops/NWCRILout/plots/'
+    path_to_write = '/Users/elizabeth.smith/Documents/Scripts/repos/fuzzy_test/'
+    path_to_plots = path_to_write
     
     #stares
     date_files = STRdsURL
@@ -951,7 +944,7 @@ for case in range(0,len(dates)):# if the loop stops for whatever reason and you 
     sigw_t = sigw_t * 60.0 # minutes
     
     ## this chunk helps us understand what signal-to-noise ratio limit we should use below
-    ## can ignore if the cutoff value is already set
+    ## can ignore if the cutoff value is already set, known
     #plt.plot(wr[0::10,0::5],snrr[0::10,0::5],'bo',alpha=.3)
     #plt.xlim(-20,20)
     #plt.xlabel('w')
@@ -1196,32 +1189,41 @@ for case in range(0,len(dates)):# if the loop stops for whatever reason and you 
         inversion.append(y[inversion_idx])
     
     # visualize Inversion Weighting and the sunset/rise times
-    plt.figure(figsize=(18,6))
-    plt.plot((membership_times-base_time)/3600.,membership_value_vec, lw=6, color='k',label='Inversion Weight')
-    plt.axvline((real_sunup-base_time)/3600.,ls='--',color='grey')
-    plt.axvline((real_sundown-base_time)/3600.,ls='--',color='grey')
-    #plt.legend()
-    plt.title(str(platform)+' '+str(date_label))#+' Inversion Weight as a Function of Sunrise/Sunset')
-    plt.xticks(np.arange(0,24.1,3),x_tick_labels)
-    plt.xlim(0,24.1)
-    plt.xlabel('Hour [UTC]')
-    plt.ylim(0,2.1)
-    plt.ylabel('Height AGL [km]')
-    plt.show()
-    
-    # visualize Inversion Height and the sunset/sunrsise times
-    plt.figure(figsize=(18,6))
-    plt.plot(x/60.,inversion, lw=6, color='k',label='Inversion Height')
-    plt.axvline((real_sunup-base_time)/3600.,ls='--',color='grey')
-    plt.axvline((real_sundown-base_time)/3600.,ls='--',color='grey')
-    #plt.legend()
-    plt.title(str(platform)+' '+str(date_label))#+' Inversion Weight as a Function of Sunrise/Sunset')
-    plt.xticks(np.arange(0,24.1,3),x_tick_labels)
-    plt.xlim(0,24.1)
-    plt.xlabel('Hour [UTC]')
-    plt.ylim(0,2.1)
-    plt.ylabel('Height AGL [km]')
-    plt.show()
+    if inv_check == True:
+        plt.figure(figsize=(18,6))
+        plt.plot((membership_times-base_time)/3600.,membership_value_vec, lw=6, color='k',label='Inversion Weight')
+        plt.axvline((real_sunup-base_time)/3600.,ls='--',color='grey')
+        plt.axvline((real_sundown-base_time)/3600.,ls='--',color='grey')
+        #plt.legend()
+        plt.title(str(platform)+' '+str(date_label))#+' Inversion Weight as a Function of Sunrise/Sunset')
+        plt.xticks(np.arange(0,24.1,3),x_tick_labels)
+        plt.xlim(0,24.1)
+        plt.xlabel('Hour [UTC]')
+        plt.ylim(0,2.1)
+        plt.ylabel('Height AGL [km]')
+        if show_me == True:
+            plt.show()
+        else:
+            plt.savefig(path_to_plots+date_label+'_InvWeight_'+platform+'.png')
+            plt.close()
+        
+        # visualize Inversion Height and the sunset/sunrsise times
+        plt.figure(figsize=(18,6))
+        plt.plot(x/60.,inversion, lw=6, color='k',label='Inversion Height')
+        plt.axvline((real_sunup-base_time)/3600.,ls='--',color='grey')
+        plt.axvline((real_sundown-base_time)/3600.,ls='--',color='grey')
+        #plt.legend()
+        plt.title(str(platform)+' '+str(date_label))#+' Inversion Weight as a Function of Sunrise/Sunset')
+        plt.xticks(np.arange(0,24.1,3),x_tick_labels)
+        plt.xlim(0,24.1)
+        plt.xlabel('Hour [UTC]')
+        plt.ylim(0,2.1)
+        plt.ylabel('Height AGL [km]')
+        if show_me == True:
+            plt.show()
+        else:
+            plt.savefig(path_to_plots+date_label+'_InvHeight_'+platform+'.png')
+            plt.close()
       
     # Compute overall aggregate values
     sum_fuzz = np.zeros_like(wVar_fuzz_intp_wt)
