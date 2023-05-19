@@ -4,7 +4,7 @@ Multi-instrument fuzzy logic PBL height detection algorithm using CLAMPS Doppler
 ## Authors
 Dr. Elizabeth Smith, NOAA NSSL (elizabeth.smith@noaa.gov)
 
-Dr. Jacob Carlin, OU CIMMS / NSSL (jacob.carlin@noaa.gov; @jtcarlin)
+Dr. Jacob Carlin, OU CIWRO / NSSL (jacob.carlin@noaa.gov; @jtcarlin)
 
 ## Background
 This algorithm was developed from the basis set forth in Bonin et al. (2018):
@@ -20,7 +20,6 @@ The authors acknowledge Dr. Tim Bonin (MIT Lincoln Labs), Tyler Bell (OU CIMMS /
 
 ## Dependent Packages
 
-- cmocean -- could skip/remove in plotting; https://github.com/matplotlib/cmocean
 - datetime
 - matplotlib
 - netCDF4
@@ -33,13 +32,14 @@ The authors acknowledge Dr. Tim Bonin (MIT Lincoln Labs), Tyler Bell (OU CIMMS /
 ## Output
 
 ### Optional Figures 
-If `plot_me=True`, several figures are generated. If `show_me=True`, they will plot to the console, otherwise they will save to the user provided plot save location. 
+If `plot_me=True`, several figures are generated. If `show_me=True`, they will plot to the console, otherwise they will save to the user provided plot save location. If option `inv_check=True` an optional extra pair of plots will be generated showing sunset/rise time dependent inversion weighting function and the inversion height. 
 
 ### Optional netCDF writeout
 If `write_me=True` the resulting PBL height estimates will be written out to a netcdf file and saved to the user provides save location. 
 
 ## Algorithm Flowchart
+![Fuzzy_flowchart](https://github.com/eeeeelizzzzz/clamps_fuzzyPBLh/assets/47791747/f9fd32c2-5d4e-4c4f-94ea-1994c1094a86)
 
-![Fuzzy_flowchart](https://user-images.githubusercontent.com/47791747/146992157-b1330260-4cb4-4a18-b5a9-be8f4ad11abc.png)
+
 
  
