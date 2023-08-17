@@ -1,4 +1,4 @@
-# clamps_fuzzyPBLh
+# BLISS-FL: Boundary-Layer height Inferred through multi Sensor Synergy-Fuzzy Logic
 Multi-instrument fuzzy logic PBL height detection algorithm using CLAMPS Doppler wind lidar and thermodynamic (in this case AERI/MWR) retrieval profiles.
 
 ## Authors
