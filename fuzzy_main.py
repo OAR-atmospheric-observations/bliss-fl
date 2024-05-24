@@ -8,7 +8,12 @@ Created on Jan 5 2021
 This is a multi-instrument fuzzy logic PBL height detection algorithm developed
 for using CLAMPS Doppler wind lidar and thermodynamic (AERI) profiles. This 
 algorithm was developed from the basis set forth in Bonin et al. (2018).
- https://doi.org/10.1175/JTECH-D-17-0159.1
+https://doi.org/10.1175/JTECH-D-17-0159.1
+
+ This is free software developed while the authors were at/with NOAA, and is
+ intended to be free software.  It is made available WITHOUT ANY WARRANTY.
+ For more information, contact the authors.
+----------------------------------------------------------------------------
 """
 #########################################################
 #All the imports
