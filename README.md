@@ -40,6 +40,9 @@ If `write_me=True` the resulting PBL height estimates will be written out to a n
 ## Algorithm Flowchart
 ![Fuzzy_flowchart](https://github.com/eeeeelizzzzz/clamps_fuzzyPBLh/assets/47791747/f9fd32c2-5d4e-4c4f-94ea-1994c1094a86)
 
+## Disclaimer
+This repository is a scientific product and is not official communication of the National Oceanic and Atmospheric Administration (NOAA), or the United States Department of Commerce. All NOAA GitHub project code is provided on an ‘as is’ basis, with no warranty, and the user assumes responsibility for its use. NOAA has relinquished control of the information and no longer has responsibility to protect the integrity, confidentiality, or availability of the information. Any claims against the Department of Commerce or NOAA stemming from the use of this GitHub project will be governed by all applicable Federal law. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by the Department of Commerce. The Department of Commerce seal and logo, or the seal and logo of a DOC bureau, shall not be used in any manner to imply endorsement of any commercial product or activity by DOC or the United States Government.
+
 
 
  
