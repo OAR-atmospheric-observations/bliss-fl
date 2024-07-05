@@ -1,6 +1,9 @@
 # BLISS-FL: Boundary-Layer height Inferred through multi Sensor Synergy-Fuzzy Logic
 Multi-instrument fuzzy logic PBL height detection algorithm using CLAMPS Doppler wind lidar and thermodynamic (in this case AERI/MWR) retrieval profiles.
 
+[![DOI](https://zenodo.org/badge/823807032.svg)](https://zenodo.org/doi/10.5281/zenodo.12641260)
+
+
 ## Authors
 Dr. Elizabeth Smith, NOAA NSSL (elizabeth.smith@noaa.gov)
 
